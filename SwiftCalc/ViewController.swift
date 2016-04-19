@@ -26,6 +26,29 @@ class ViewController: NSViewController {
     
     var userIsTyping = false
 
+    @IBAction func operate(sender: AnyObject) {
+        
+        let operation = sender.title!
+        print(sender.title!)
+        if userIsTyping{
+            sendEnter()
+        }
+        
+        switch operation {
+        case "⨉":
+            performOperation() { $0 * $1 }
+        case "÷":
+            performOperation() { $1 * $0 }
+        case "+":
+            performOperation() { $0 + $1 }
+        case "-":
+            performOperation() { $1 - $0 }
+        default:
+            break
+        }
+        
+    }
+    
     @IBAction func appendDigit(sender: NSButton) {
         let digit = sender.title
         //print("digit = ", digit)
@@ -42,9 +65,7 @@ class ViewController: NSViewController {
     var operandStack = Array<Double>()
     
     @IBAction func enter(sender: AnyObject) {
-        userIsTyping = false
-        operandStack.append(displayValue)
-        print("operand stack = ", operandStack)
+        sendEnter()
     }
     
     var displayValue: Double {
@@ -52,9 +73,21 @@ class ViewController: NSViewController {
             return NSNumberFormatter().numberFromString(display.stringValue)!.doubleValue
         }
         set {
-            display.stringValue = ("newValue")
+            display.stringValue =  "\(newValue)"
             userIsTyping = false
         }
+    }
+    
+    func performOperation(operation: (Double, Double) -> Double) {
+        if operandStack.count >= 2 {
+            displayValue = operation(operandStack.removeLast(), operandStack.removeLast())
+        }
+    }
+    
+    func sendEnter() {
+        userIsTyping = false
+        operandStack.append(displayValue)
+        print("operand stack = ", operandStack)
     }
 }
 
